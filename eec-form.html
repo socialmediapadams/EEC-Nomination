@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee Engagement Committee – Nomination Form</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f0f4f8;
+    color: #1a1a2e;
+    min-height: 100vh;
+    padding: 24px 16px 48px;
+  }
+
+  .page-wrap { max-width: 720px; margin: 0 auto; }
+
+  /* ── Header ── */
+  .form-header {
+    background: #0C447C;
+    border-radius: 14px 14px 0 0;
+    padding: 28px 32px 24px;
+    color: #fff;
+  }
+  .logo-row { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+  .icon-box {
+    width: 44px; height: 44px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .icon-box svg { width: 24px; height: 24px; }
+  .form-header h1 { font-size: 19px; font-weight: 600; line-height: 1.3; }
+  .form-header .dept { font-size: 13px; opacity: 0.78; margin-top: 3px; }
+  .form-header .subtitle {
+    font-size: 13px; opacity: 0.72; margin-top: 10px;
+    line-height: 1.55;
+  }
+
+  /* ── Body ── */
+  .form-body {
+    background: #fff;
+    border-radius: 0 0 14px 14px;
+    padding: 28px 32px 32px;
+    border: 1px solid #dce3ed;
+    border-top: none;
+  }
+
+  /* ── Section title ── */
+  .section { margin-bottom: 22px; }
+  .section-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+    text-transform: uppercase; color: #185FA5;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 16px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: #e2e8f2; }
+
+  /* ── Grid ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media(max-width:560px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .form-body { padding: 20px 18px 24px; }
+    .form-header { padding: 22px 18px 20px; }
+  }
+
+  /* ── Field ── */
+  .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { font-size: 12px; font-weight: 600; color: #5a6a7e; }
+  .field label .req { color: #e24b4a; margin-left: 2px; }
+  .field input,
+  .field textarea {
+    width: 100%; padding: 9px 12px;
+    border: 1px solid #d0d8e4; border-radius: 8px;
+    font-size: 14px; font-family: inherit;
+    background: #fff; color: #1a1a2e;
+    outline: none;
+    transition: border-color 0.18s, box-shadow 0.18s;
+  }
+  .field input { height: 38px; }
+  .field textarea {
+    height: 100px; resize: vertical; line-height: 1.55;
+  }
+  .field input:focus, .field textarea:focus {
+    border-color: #185FA5;
+    box-shadow: 0 0 0 3px rgba(24,95,165,0.12);
+  }
+  .field input.error, .field textarea.error {
+    border-color: #e24b4a;
+    box-shadow: 0 0 0 3px rgba(226,75,74,0.1);
+  }
+  .char-count {
+    font-size: 11px; color: #8a9ab0;
+    text-align: right; margin-top: 3px;
+  }
+  .char-count.warn { color: #e24b4a; }
+
+  /* ── Radio group ── */
+  .radio-group { display: flex; gap: 16px; margin-top: 4px; flex-wrap: wrap; }
+  .radio-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 16px;
+    border: 1px solid #d0d8e4; border-radius: 8px;
+    cursor: pointer; font-size: 13px; font-weight: 500;
+    color: #3a4a5e;
+    transition: border-color 0.15s, background 0.15s;
+    user-select: none;
+  }
+  .radio-item:hover { border-color: #185FA5; background: #f0f6ff; }
+  .radio-item input[type="radio"] {
+    width: 16px; height: 16px; accent-color: #185FA5; cursor: pointer;
+    margin: 0;
+  }
+  .radio-item.selected {
+    border-color: #185FA5; background: #e6f1fb; color: #0C447C;
+  }
+  .radio-group.error .radio-item { border-color: #e24b4a; }
+
+  /* ── Declaration ── */
+  .declaration-box {
+    background: #f7f9fc;
+    border: 1px solid #dce3ed;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+  }
+  .declaration-box h3 {
+    font-size: 13px; font-weight: 700;
+    color: #1a1a2e; margin-bottom: 12px;
+  }
+  .declaration-text {
+    font-size: 12.5px; color: #4a5568; line-height: 1.65;
+    padding: 12px 14px;
+    background: #fff;
+    border: 1px solid #e2e8f2;
+    border-radius: 8px;
+    margin-bottom: 14px;
+  }
+  .consent-row {
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .consent-row input[type="checkbox"] {
+    width: 17px; height: 17px; min-width: 17px;
+    margin-top: 2px; accent-color: #185FA5; cursor: pointer;
+  }
+  .consent-row input[type="checkbox"].error {
+    outline: 2px solid #e24b4a; border-radius: 3px;
+  }
+  .consent-row label {
+    font-size: 12.5px; color: #1a1a2e;
+    line-height: 1.55; cursor: pointer; font-weight: 500;
+  }
+
+  /* ── Error msg ── */
+  .err-msg {
+    font-size: 11.5px; color: #a32d2d;
+    margin-top: 4px; display: none;
+  }
+  .err-msg.show { display: block; }
+
+  /* ── Submit ── */
+  .btn-submit {
+    width: 100%; padding: 13px;
+    background: #0C447C; color: #fff;
+    border: none; border-radius: 9px;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background 0.18s;
+    margin-top: 4px;
+  }
+  .btn-submit:hover    { background: #185FA5; }
+  .btn-submit:disabled { background: #8aabb5; cursor: not-allowed; }
+
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Toast ── */
+  .toast {
+    display: none; margin-top: 14px;
+    padding: 12px 16px; border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+  }
+  .toast.success {
+    background: #eaf3de; color: #27500a;
+    border: 1px solid #c0dd97;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .toast.error {
+    background: #fcebeb; color: #791f1f;
+    border: 1px solid #f7c1c1;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* ── Field number badge ── */
+  .field-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #e6f1fb; color: #185FA5;
+    font-size: 11px; font-weight: 700;
+    margin-right: 5px; flex-shrink: 0;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- ── Header ── -->
+  <div class="form-header">
+    <div class="logo-row">
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Employee Engagement Committee</h1>
+        <p class="dept">Padam's &nbsp;|&nbsp; Human Resources</p>
+      </div>
+    </div>
+    <p class="subtitle">
+      We invite passionate and enthusiastic employees to be part of our Employee Engagement Committee.
+      Please fill in the details below to express your interest.
+    </p>
+  </div>
+
+  <!-- ── Form Body ── -->
+  <div class="form-body">
+    <form id="eecForm" novalidate>
+
+      <!-- Personal Details -->
+      <div class="section">
+        <div class="section-title">&#9679; Employee Details</div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="empId"><span class="field-num">1</span>Employee ID <span class="req">*</span></label>
+            <input type="text" id="empId" placeholder="e.g. EMP00123">
+            <span class="err-msg" id="err-empId">Please enter your Employee ID.</span>
+          </div>
+          <div class="field">
+            <label for="empName"><span class="field-num">2</span>Employee Name <span class="req">*</span></label>
+            <input type="text" id="empName" placeholder="Full name">
+            <span class="err-msg" id="err-empName">Please enter your full name.</span>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="department"><span class="field-num">3</span>Department / Function <span class="req">*</span></label>
+            <input type="text" id="department" placeholder="e.g. Human Resources">
+            <span class="err-msg" id="err-department">Please enter your department.</span>
+          </div>
+          <div class="field">
+            <label for="location"><span class="field-num">4</span>Location <span class="req">*</span></label>
+            <input type="text" id="location" placeholder="e.g. Mumbai">
+            <span class="err-msg" id="err-location">Please enter your location.</span>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="designation"><span class="field-num">5</span>Designation <span class="req">*</span></label>
+            <input type="text" id="designation" placeholder="e.g. Senior Executive">
+            <span class="err-msg" id="err-designation">Please enter your designation.</span>
+          </div>
+          <div class="field">
+            <label for="mobile"><span class="field-num">6</span>Mobile Number <span class="req">*</span></label>
+            <input type="tel" id="mobile" placeholder="10-digit mobile number" maxlength="10">
+            <span class="err-msg" id="err-mobile">Please enter a valid 10-digit mobile number.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Questions -->
+      <div class="section">
+        <div class="section-title">&#9679; Committee Interest</div>
+
+        <div class="field">
+          <label for="whyJoin">
+            <span class="field-num">7</span>
+            Why would you like to be a part of the Employee Engagement Committee?
+            <span class="req">*</span>
+          </label>
+          <textarea id="whyJoin" placeholder="Share your motivation in a few lines..." maxlength="500"
+            oninput="updateCharCount()"></textarea>
+          <div class="char-count" id="charCount">0 / 500 characters</div>
+          <span class="err-msg" id="err-whyJoin">Please share your reason for joining.</span>
+        </div>
+
+        <div class="field">
+          <label>
+            <span class="field-num">8</span>
+            Are you willing to dedicate time for committee meetings and activities, as required?
+            <span class="req">*</span>
+          </label>
+          <div class="radio-group" id="commitGroup">
+            <label class="radio-item" id="lbl-yes">
+              <input type="radio" name="commit" value="Yes" onchange="selectRadio('Yes')">
+              &#9989; Yes
+            </label>
+            <label class="radio-item" id="lbl-no">
+              <input type="radio" name="commit" value="No" onchange="selectRadio('No')">
+              &#10060; No
+            </label>
+          </div>
+          <span class="err-msg" id="err-commit">Please select Yes or No.</span>
+        </div>
+      </div>
+
+      <!-- Declaration -->
+      <div class="declaration-box">
+        <h3>&#128221; Declaration</h3>
+        <div class="declaration-text">
+          I voluntarily express my interest in joining the Employee Engagement Committee.
+          I understand that participation is voluntary and forms part of my contribution
+          beyond my regular responsibilities, and I will keep my reporting managers
+          informed of my involvement.
+        </div>
+        <div class="consent-row">
+          <input type="checkbox" id="declaration">
+          <label for="declaration">
+            I have read and agree to the above declaration.
+          </label>
+        </div>
+        <span class="err-msg" id="err-declaration" style="margin-top:8px;margin-left:27px">
+          Please accept the declaration before submitting.
+        </span>
+      </div>
+
+      <button type="submit" class="btn-submit" id="btnSubmit">
+        <span id="btnText">Submit Nomination</span>
+        <div class="spinner" id="spinner"></div>
+      </button>
+
+      <div class="toast" id="toast"></div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  Apna Google Apps Script Web App URL yahan paste karo
+// ══════════════════════════════════════════════════════
+var SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+
+// ── Character counter ─────────────────────────────────
+function updateCharCount() {
+  var ta  = document.getElementById("whyJoin");
+  var cc  = document.getElementById("charCount");
+  var len = ta.value.length;
+  cc.textContent = len + " / 500 characters";
+  cc.classList.toggle("warn", len > 450);
+}
+
+// ── Radio styling ─────────────────────────────────────
+function selectRadio(val) {
+  document.getElementById("lbl-yes").classList.toggle("selected", val === "Yes");
+  document.getElementById("lbl-no").classList.toggle("selected",  val === "No");
+  document.getElementById("commitGroup").classList.remove("error");
+  document.getElementById("err-commit").classList.remove("show");
+}
+
+// ── Validation ────────────────────────────────────────
+function clearErrors() {
+  document.querySelectorAll(".error").forEach(function(el) { el.classList.remove("error"); });
+  document.querySelectorAll(".err-msg").forEach(function(el) { el.classList.remove("show"); });
+  document.getElementById("commitGroup").classList.remove("error");
+}
+
+function setError(fieldId, errId) {
+  var f = document.getElementById(fieldId);
+  var e = document.getElementById(errId);
+  if (f) f.classList.add("error");
+  if (e) e.classList.add("show");
+}
+
+function validate() {
+  clearErrors();
+  var ok = true;
+
+  // Required text fields
+  var fields = [
+    { id:"empId",       err:"err-empId"       },
+    { id:"empName",     err:"err-empName"      },
+    { id:"department",  err:"err-department"   },
+    { id:"location",    err:"err-location"     },
+    { id:"designation", err:"err-designation"  },
+    { id:"whyJoin",     err:"err-whyJoin"      }
+  ];
+  fields.forEach(function(f) {
+    if (!document.getElementById(f.id).value.trim()) {
+      setError(f.id, f.err); ok = false;
+    }
+  });
+
+  // Mobile — 10 digits
+  var mob = document.getElementById("mobile").value.trim();
+  if (!mob || !/^\d{10}$/.test(mob)) {
+    setError("mobile", "err-mobile"); ok = false;
+  }
+
+  // Radio — willing to commit
+  var commit = document.querySelector('input[name="commit"]:checked');
+  if (!commit) {
+    document.getElementById("commitGroup").classList.add("error");
+    document.getElementById("err-commit").classList.add("show");
+    ok = false;
+  }
+
+  // Declaration checkbox
+  if (!document.getElementById("declaration").checked) {
+    document.getElementById("declaration").classList.add("error");
+    document.getElementById("err-declaration").classList.add("show");
+    ok = false;
+  }
+
+  if (!ok) {
+    var first = document.querySelector(".error, .err-msg.show");
+    if (first) first.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+  return ok;
+}
+
+// ── Submit ────────────────────────────────────────────
+document.getElementById("eecForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+  if (!validate()) return;
+
+  if (SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
+    showToast("error", "SCRIPT_URL set nahi ki! eec-form.html mein apna Apps Script URL paste karo.");
+    return;
+  }
+
+  setLoading(true);
+
+  var commit = document.querySelector('input[name="commit"]:checked');
+
+  var payload = {
+    empId              : document.getElementById("empId").value.trim(),
+    empName            : document.getElementById("empName").value.trim(),
+    department         : document.getElementById("department").value.trim(),
+    location           : document.getElementById("location").value.trim(),
+    designation        : document.getElementById("designation").value.trim(),
+    mobile             : document.getElementById("mobile").value.trim(),
+    whyJoin            : document.getElementById("whyJoin").value.trim(),
+    willingToCommit    : commit ? commit.value : "",
+    declarationAccepted: document.getElementById("declaration").checked
+  };
+
+  fetch(SCRIPT_URL, {
+    method  : "POST",
+    headers : { "Content-Type": "text/plain" },
+    body    : JSON.stringify(payload)
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(result) {
+    setLoading(false);
+    if (result.status === "success") {
+      showToast("success",
+        "&#10003; Your nomination has been submitted successfully! HR will get in touch with you.");
+      document.getElementById("eecForm").reset();
+      document.getElementById("lbl-yes").classList.remove("selected");
+      document.getElementById("lbl-no").classList.remove("selected");
+      document.getElementById("charCount").textContent = "0 / 500 characters";
+    } else {
+      showToast("error", "Submission failed: " + (result.message || "Unknown error."));
+    }
+  })
+  .catch(function(err) {
+    setLoading(false);
+    showToast("error", "Network error: " + err.message);
+  });
+});
+
+// ── Helpers ───────────────────────────────────────────
+function setLoading(on) {
+  document.getElementById("btnSubmit").disabled    = on;
+  document.getElementById("spinner").style.display = on ? "block" : "none";
+  document.getElementById("btnText").textContent   = on ? "Submitting…" : "Submit Nomination";
+}
+
+function showToast(type, msg) {
+  var t = document.getElementById("toast");
+  t.className = "toast " + type;
+  t.innerHTML = msg;
+  t.style.display = "flex";
+  t.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  if (type === "success") {
+    setTimeout(function() { t.style.display = "none"; }, 8000);
+  }
+}
+
+// Mobile — only digits allowed
+document.getElementById("mobile").addEventListener("input", function() {
+  this.value = this.value.replace(/\D/g, "").slice(0, 10);
+});
+</script>
+</body>
+</html>
