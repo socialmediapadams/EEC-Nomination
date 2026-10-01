@@ -183,6 +183,17 @@
     margin-top: 4px; display: none;
   }
   .err-msg.show { display: block; }
+  .duplicate-note {
+    font-size: 11.5px; color: #8a3b12;
+    background: #fff4e8;
+    border: 1px solid #f1c79e;
+    border-radius: 7px;
+    padding: 9px 10px;
+    margin-top: 7px;
+    display: none;
+    line-height: 1.45;
+  }
+  .duplicate-note.show { display: block; }
 
   /* ── Submit ── */
   .btn-submit {
@@ -277,8 +288,9 @@
         <div class="grid-2">
           <div class="field">
             <label for="empId"><span class="field-num">1</span>Employee ID <span class="req">*</span></label>
-            <input type="text" id="empId" placeholder="e.g. EMP00123">
+            <input type="text" id="empId" placeholder="e.g. EMP00123" autocomplete="off">
             <span class="err-msg" id="err-empId">Please enter your Employee ID.</span>
+            <div class="duplicate-note" id="duplicateNote"></div>
           </div>
           <div class="field">
             <label for="empName"><span class="field-num">2</span>Employee Name <span class="req">*</span></label>
@@ -465,51 +477,178 @@ function validate() {
   return ok;
 }
 
+// ── Duplicate submission protection ─────────────────────
+var duplicateCheckTimer = null;
+var duplicateCheckedId = "";
+var duplicateExists = false;
+
+function normalizeEmpId(value) {
+  return String(value || "").trim().toUpperCase();
+}
+
+function clearDuplicateState() {
+  duplicateExists = false;
+  duplicateCheckedId = "";
+  var note = document.getElementById("duplicateNote");
+  if (note) {
+    note.classList.remove("show");
+    note.innerHTML = "";
+  }
+}
+
+function showDuplicateMessage(message) {
+  var note = document.getElementById("duplicateNote");
+  if (!note) return;
+  note.innerHTML = "&#9888; " + message;
+  note.classList.add("show");
+  document.getElementById("empId").classList.add("error");
+}
+
+function checkEmployeeId(callback) {
+  var empId = normalizeEmpId(document.getElementById("empId").value);
+  if (!empId) {
+    clearDuplicateState();
+    callback(false, false);
+    return;
+  }
+
+  if (empId === duplicateCheckedId) {
+    callback(true, duplicateExists);
+    return;
+  }
+
+  try {
+    if (localStorage.getItem("eec_submitted_" + empId) === "1") {
+      duplicateCheckedId = empId;
+      duplicateExists = true;
+      showDuplicateMessage("This Employee ID has already submitted a nomination. One employee can submit only once.");
+      callback(true, true);
+      return;
+    }
+  } catch (e) {}
+
+  var callbackName = "eecDuplicateCheck_" + Date.now() + "_" + Math.floor(Math.random() * 100000);
+  var script = document.createElement("script");
+  var finished = false;
+  var timeout = setTimeout(function() {
+    if (finished) return;
+    finished = true;
+    cleanup();
+    callback(false, false);
+  }, 8000);
+
+  window[callbackName] = function(result) {
+    if (finished) return;
+    finished = true;
+    clearTimeout(timeout);
+    cleanup();
+    duplicateCheckedId = empId;
+    duplicateExists = !!(result && result.exists);
+    if (duplicateExists) {
+      showDuplicateMessage("This Employee ID has already submitted a nomination. One employee can submit only once.");
+    }
+    callback(true, duplicateExists);
+  };
+
+  function cleanup() {
+    try { delete window[callbackName]; } catch (e) { window[callbackName] = undefined; }
+    if (script.parentNode) script.parentNode.removeChild(script);
+  }
+
+  script.onerror = function() {
+    if (finished) return;
+    finished = true;
+    clearTimeout(timeout);
+    cleanup();
+    callback(false, false);
+  };
+
+  script.src = SCRIPT_URL + "?action=check&empId=" + encodeURIComponent(empId) +
+               "&callback=" + encodeURIComponent(callbackName) + "&_=" + Date.now();
+  document.head.appendChild(script);
+}
+
+// Check when the employee ID field is left.
+document.getElementById("empId").addEventListener("blur", function() {
+  checkEmployeeId(function(ok, exists) {
+    if (ok && exists) {
+      showDuplicateMessage("This Employee ID has already submitted a nomination. One employee can submit only once.");
+    }
+  });
+});
+
+document.getElementById("empId").addEventListener("input", function() {
+  clearDuplicateState();
+});
+
 // ── Submit ────────────────────────────────────────────
 document.getElementById("eecForm").addEventListener("submit", function(e) {
   e.preventDefault();
   if (!validate()) return;
 
   if (SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
-    showToast("error", "SCRIPT_URL set nahi ki! eec-form.html mein apna Apps Script URL paste karo.");
+    showToast("error", "SCRIPT_URL set nahi ki! Apna Apps Script Web App URL paste karo.");
     return;
   }
 
   setLoading(true);
 
-  var commit = document.querySelector('input[name="commit"]:checked');
+  checkEmployeeId(function(checkOk, exists) {
+    if (!checkOk) {
+      setLoading(false);
+      showToast("error", "Employee ID verify nahi ho paya. Please check your internet connection and try again.");
+      return;
+    }
 
-  var payload = {
-    empId              : document.getElementById("empId").value.trim(),
-    empName            : document.getElementById("empName").value.trim(),
-    department         : document.getElementById("department").value.trim(),
-    location           : document.getElementById("location").value.trim(),
-    designation        : document.getElementById("designation").value.trim(),
-    mobile             : document.getElementById("mobile").value.trim(),
-    whyJoin            : document.getElementById("whyJoin").value.trim(),
-    willingToCommit    : commit ? commit.value : "",
-    declarationAccepted: document.getElementById("declaration").checked
-  };
+    if (exists) {
+      setLoading(false);
+      showDuplicateMessage("This Employee ID has already submitted a nomination. You cannot submit the form again.");
+      showToast("error", "Duplicate submission blocked. This Employee ID has already submitted a nomination.");
+      document.getElementById("empId").scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
 
-  fetch(SCRIPT_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "text/plain" },
-    body: JSON.stringify(payload)
-  })
-  .then(function() {
-    setLoading(false);
-    showToast("success",
-      "&#10003; Your nomination has been submitted successfully! HR will get in touch with you.");
-    document.getElementById("eecForm").reset();
-    document.getElementById("lbl-yes").classList.remove("selected");
-    document.getElementById("lbl-no").classList.remove("selected");
-    document.getElementById("charCount").textContent = "0 / 500 characters";
-  })
-  .catch(function(err) {
-    setLoading(false);
-    showToast("error", "Submission failed. Please try again.");
-    console.error(err);
+    var commit = document.querySelector('input[name="commit"]:checked');
+
+    var payload = {
+      empId              : normalizeEmpId(document.getElementById("empId").value),
+      empName            : document.getElementById("empName").value.trim(),
+      department         : document.getElementById("department").value.trim(),
+      location           : document.getElementById("location").value.trim(),
+      designation        : document.getElementById("designation").value.trim(),
+      mobile             : document.getElementById("mobile").value.trim(),
+      whyJoin            : document.getElementById("whyJoin").value.trim(),
+      willingToCommit    : commit ? commit.value : "",
+      declarationAccepted: document.getElementById("declaration").checked
+    };
+
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify(payload)
+    })
+    .then(function() {
+      setLoading(false);
+
+      // Local convenience lock. Server-side Apps Script check is the real restriction.
+      try { localStorage.setItem("eec_submitted_" + payload.empId, "1"); } catch (e) {}
+
+      showToast("success",
+        "&#10003; Your nomination has been submitted successfully! HR will get in touch with you.");
+      document.getElementById("eecForm").reset();
+      document.getElementById("lbl-yes").classList.remove("selected");
+      document.getElementById("lbl-no").classList.remove("selected");
+      document.getElementById("charCount").textContent = "0 / 500 characters";
+      clearDuplicateState();
+      duplicateCheckedId = payload.empId;
+      duplicateExists = true;
+    })
+    .catch(function(err) {
+      setLoading(false);
+      showToast("error", "Submission failed. Please try again.");
+      console.error(err);
+    });
   });
 });
 
